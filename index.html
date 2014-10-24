@@ -7,7 +7,7 @@
     <title>Bootstrap 101 Template</title>
 
     <!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -17,13 +17,29 @@
     <![endif]-->
   </head>
   <body>
-	<div class="container">
-	  ...
-	</div>
+	<div class="container-fluid">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Trending on Wikipedia</th>
+					<th>Article Matches</th>
+					<th>Related Topics</th>
+				</tr>
+			</thead>
+			<tbody id="theTableBody">
+			</tbody>
+			<tfoot></tfoot>
+		</table>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="js/bootstrap.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="js/hackathon.js"></script>
+    <script>
+		console.log("About to call init");
+		$( init );
+    </script>
+
   </body>
 </html>

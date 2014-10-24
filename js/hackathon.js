@@ -180,7 +180,7 @@ function constructRow ( wikiTopic ) {
 			function ( i, v ) {
 				linkToArticle = "http://" + v.host + "/" + v.path;
 				linkToEdit = "http://" + v.site + "admin.about.com" + "/" + v.path;
-				articleMatches += "<a name= 'replace-url' href='" + linkToArticle +"'>" + v.path.replace(/^.*\//, "") + "</a> <a target='_blank' href='" + linkToEdit + "'><span class='glyphicon glyphicon-edit'></span></a><br>";
+				articleMatches += "<a name= 'replace-url' href='" + linkToArticle +"'>" + v.path.replace(/^.*\//, "") + "</a> <a target='_blank' href='" + linkToEdit + "'> <img src='img/facebook.png'> <span class='glyphicon glyphicon-edit'></span></a><br>";
 			}
 		);		
 	}

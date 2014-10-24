@@ -3,13 +3,13 @@
 
 // Atlas Endpoint
 var token = "eyJleHBpcmVzIjoxNDE0MTk2NzczLCJ1c2VyX2lkIjoiMjc5MzEi.u1uVhgMm1Enb9bbLWjnGJ/X0"; // Atlas endpoints
-var atlasEndpoint = "http://nyqaguide2.ops.about.com:5000/search/atlas?access_token=" + token + "url=";
+var atlasEndpoint = "http://nyqaguide2.ops.about.com:5000/api/search/atlas?access_token=" + token + "&url=";
 
-function init() {
-	console.log("called init");
-	getTrendingTopics ();
-
-}
+//function init() {
+//	console.log("called init");
+//	getTrendingTopics ();
+//
+//}
 
 function getArticleInfo (url) {
 	$.getJSON (
@@ -26,9 +26,10 @@ function getArticleInfo (url) {
 	);
 }
 
-function getTrendingTopics () {
+function getTrendingTopics (site) {
 	$.getJSON(
-		"http://localhost/development/hackathon/js/wikitrends2.json",
+//		"http://localhost/development/hackathon/js/wikitrends2.json",
+        "http://nybdssmodel1.ops.about.com:8256/hackathon/site_trends/" + site,
 		function( data ) {
 			var trendingData = data;
 			var rows = "";
@@ -48,30 +49,48 @@ function getTrendingTopics () {
 function fetchArticleNames () {
 
 	$("[name='replace-url']").each(
-		function () {
+		function (i) {
 			getArticleAndReplaceName($(this));
 		}
 	)
 }
 
 function getArticleAndReplaceName(anchor) {
-	$.getJSON(
-		atlasEndpoint + encodeURIComponent(anchor.attr('href')),
-		function (data) {
-			if (data.docs.length > 0) {
-				var published = data.docs[0].published;
-				var refreshed = data.docs[0].refreshed;
-				var title = data.docs[0].title;
-				var pv = data.docs[0].pv;
-				var movement = data.docs[0].movement;
-				anchor.text(title);
-				anchor.attr('data-published', published);
-				anchor.attr('data-refreshed', refreshed);
-				anchor.attr('data-pv', pv);
-				anchor.attr('data=movement', movement);
-			}
-		}
-	);
+console.log("CALLED getArticleAndReplaceName");
+//	$("#debug").ajaxError(
+//		function (event, xhr, opt, exception) {
+			
+			$.getJSON(
+				atlasEndpoint + encodeURIComponent(anchor.attr('href')),
+				function (data) {
+					if (data.docs.length > 0) {
+						var published = Date.parse(data.docs[0].published);
+						var refreshed = Date.parse(data.docs[0].refreshed);
+						var title = data.docs[0].title;
+						var pv = data.docs[0].pv;
+						var movement = data.docs[0].move;
+						
+						var info = "Published: " + published + "<br>Refreshed: " + refreshed + "<br>PV: " + pv + "<br>movement: " + movement;
+						
+						anchor.text(title);
+						anchor.attr('data-published', published);
+						anchor.attr('data-refreshed', refreshed);
+						anchor.attr('data-pv', pv);
+						anchor.attr('data-movement', movement);
+						anchor.attr('data-original-title', info);
+						anchor.attr('data-toggle', 'tooltip');
+						anchor.tooltip({
+							placement:"top",
+							html:true
+						});
+						console.log("getArticleAndReplaceName for " + title);
+					}
+				}
+			);
+	
+//		}
+//	);
+
 }
 
 function fetchRelated () {
@@ -98,14 +117,16 @@ function constructRelatedTopics ( relatedTopics ) {
 		$.each (
 			relatedTopics,
 			function ( i, v ) {
-				if (i < 5) {
+				if (i > 0 && i < 6) {
 					topicMatches += "<li class=''><a href='#'>" + v.title + "</a><ul name='related-topic' data-mid='" + v.mid + "'></ul></li>";	
 				}
 			}
 		);
+/*
 		if (size > 5) {
 			topicMatches += "...";
 		}
+*/
 		topicMatches += "</ul>";
 	}
 	return topicMatches;
@@ -165,10 +186,21 @@ function constructRow ( wikiTopic ) {
 	}
 	topicMatches = constructRelatedTopics ( relatedTopics );
 
-	
+    var fb_link = "";
+    var wiki_link = "";
+    if (wikiTopic.fb_mid) {
+        fb_link = "<a href='http://www.freebase.com" + wikiTopic.fb_mid + "'><img src='img/freebase.png'></a>";
+    }
+
+    if (wikiTopic.wiki) {
+        wiki_link = "<a href='" + wikiTopic.wiki + "'><img src='img/wikipedia-icon.png'></a>";
+    }
+
+    var views = "<div style='margin: 5px'>" + wikiTopic.views + " views</div>";
+
 	var row = "";
 	row += "<tr>";
-	row += "<td>" + topic + "</td>";
+	row += "<td>" + "<span style='font-weight: bold'>" + topic + "</span>" + "<span style='margin: 0 5px'>" + fb_link + wiki_link + "</span>" + views + "</td>";
 	row += "<td>" + articleMatches + "</td>";
 	row += "<td>" + topicMatches + "</td>";
 	row += "</tr>";

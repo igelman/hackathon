@@ -47,17 +47,19 @@ function constructRelatedTopics ( relatedTopics ) {
 	var topicMatches = "";
 	if ( relatedTopics != null ) {
 		size = relatedTopics.length;
+		topicMatches += "<ul class='nav nav-pills nav-stacked'>";
 		$.each (
 			relatedTopics,
 			function ( i, v ) {
 				if (i < 5) {
-					topicMatches += "<span name='related-topic' data-mid='" + v.mid + "'></span>" + v.title + "<br>";	
+					topicMatches += "<li class=''><a href='#'>" + v.title + "</a><ul name='related-topic' data-mid='" + v.mid + "'></ul></li>";	
 				}
 			}
 		);
 		if (size > 5) {
 			topicMatches += "...";
 		}
+		topicMatches += "</ul>";
 	}
 	return topicMatches;
 }
@@ -70,13 +72,21 @@ function getRelatedArticlesFromMid (mid, span) {
 		function (data) {
 		console.log(data);
 			if (data != null && data.matches != null) {
+				if (data.matches.length) {
+	 				span.addClass("dropdown-menu");
+				}
 				$.each (
 					data.matches,
 					function ( i, v ) {
-						relatedArticles += v.host + "/" + v.path + "<br>";
+						relatedArticles += "<li>" + v.host + "/" + v.path + "</li>";
 					}
 				);
 				span.html(relatedArticles);
+				span.parent().addClass("dropdown");
+				span.parent().children(":first-child").addClass("dropdown-toggle");
+				span.parent().children(":first-child").attr("data-toggle", "dropdown");
+				span.parent().children(":first-child").append("<b class='caret'></b>");
+
 			}
 		}
 	);

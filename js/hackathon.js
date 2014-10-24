@@ -1,8 +1,29 @@
+// Hackathon Endpoint
+// http://nybdssmodel1.ops.about.com:8256/hackathon/site_trends/comicbooks
+
+// Atlas Endpoint
+var token = "eyJleHBpcmVzIjoxNDE0MTk2NzczLCJ1c2VyX2lkIjoiMjc5MzEi.u1uVhgMm1Enb9bbLWjnGJ/X0"; // Atlas endpoints
+var atlasEndpoint = "http://nyqaguide2.ops.about.com:5000/search/atlas?access_token=" + token + "url=";
 
 function init() {
 	console.log("called init");
 	getTrendingTopics ();
 
+}
+
+function getArticleInfo (url) {
+	$.getJSON (
+		atlasEndpoint + encodeURIComponent(url),
+		function (data) {
+			if (data.docs.length > 0) {
+				var published = Date.parse(data.docs[0].published);
+				var refreshed = Date.parse(data.docs[0].refreshed);
+				var title = data.docs[0].title;
+				var pv = data.docs[0].pv;
+				var movement = data.docs[0].movement;
+			}
+		}
+	);
 }
 
 function getTrendingTopics () {
@@ -19,6 +40,36 @@ function getTrendingTopics () {
 			);
 			drawRows(rows);
 			fetchRelated();
+			fetchArticleNames();
+		}
+	);
+}
+
+function fetchArticleNames () {
+
+	$("[name='replace-url']").each(
+		function () {
+			getArticleAndReplaceName($(this));
+		}
+	)
+}
+
+function getArticleAndReplaceName(anchor) {
+	$.getJSON(
+		atlasEndpoint + encodeURIComponent(anchor.attr('href')),
+		function (data) {
+			if (data.docs.length > 0) {
+				var published = data.docs[0].published;
+				var refreshed = data.docs[0].refreshed;
+				var title = data.docs[0].title;
+				var pv = data.docs[0].pv;
+				var movement = data.docs[0].movement;
+				anchor.text(title);
+				anchor.attr('data-published', published);
+				anchor.attr('data-refreshed', refreshed);
+				anchor.attr('data-pv', pv);
+				anchor.attr('data=movement', movement);
+			}
 		}
 	);
 }
@@ -36,10 +87,6 @@ function drawRows (rows) {
 }
 
 function constructTopic ( topic ) {
-	
-}
-
-function constructArticleMatches ( articles ) {
 	
 }
 
@@ -94,6 +141,11 @@ function getRelatedArticlesFromMid (mid, span) {
 
 }
 
+function constructArticleMatches ( articles ) {
+	
+}
+
+
 function constructRow ( wikiTopic ) {
 	var topic = wikiTopic.topic;
 	var articles = wikiTopic.articles;
@@ -107,7 +159,7 @@ function constructRow ( wikiTopic ) {
 			function ( i, v ) {
 				linkToArticle = "http://" + v.host + "/" + v.path;
 				linkToEdit = "http://" + v.site + "admin.about.com" + "/" + v.path;
-				articleMatches += "<a href='" + linkToArticle +"'>" + v.path.replace(/^.*\//, "") + "</a> <a target='_blank' href='" + linkToEdit + "'><span class='glyphicon glyphicon-edit'></span></a><br>";
+				articleMatches += "<a name= 'replace-url' href='" + linkToArticle +"'>" + v.path.replace(/^.*\//, "") + "</a> <a target='_blank' href='" + linkToEdit + "'><span class='glyphicon glyphicon-edit'></span></a><br>";
 			}
 		);		
 	}
